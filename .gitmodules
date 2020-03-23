@@ -1,0 +1,3 @@
+[submodule "prometheus-cpp"]
+	path = prometheus-cpp
+	url = https://github.com/jupp0r/prometheus-cpp.git
