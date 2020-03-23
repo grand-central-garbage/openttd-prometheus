@@ -3236,6 +3236,10 @@ make_sed() {
 		s@!!DISTCC!!@$distcc@g;
 		s@!!NFORENUM!!@$nforenum@g;
 		s@!!GRFCODEC!!@$grfcodec@g;
+        s@!!PROM_DIR!!@$PROM_DIR@;
+        s@!!PROM_LIB!!@$PROM_LIB@;
+        s@!!PROM_INCLUDE!!@$PROM_INCLUDE@;
+        s@!!PROM_CORE!!@$PROM_CORE@;
 	"
 
 	if [ "$icon_theme_dir" != "" ]; then
