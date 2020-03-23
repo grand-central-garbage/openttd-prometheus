@@ -55,6 +55,11 @@ LANG_DIR="$SRC_DIR/lang"
 MEDIA_DIR="$ROOT_DIR/media"
 SOURCE_LIST="$ROOT_DIR/source.list"
 
+PROM_DIR="$ROOT_DIR/prometheus-cpp"
+PROM_LIB="$PROM_DIR/out/usr/local/lib"
+PROM_INCLUDE="$PROM_DIR/out/usr/local/include"
+PROM_CORE="$PROM_DIR/out/usr/local/lib/libprometheus-cpp-core.a"
+
 if [ "$1" = "--reconfig" ] || [ "$1" = "--reconfigure" ]; then
 	if [ ! -f "config.cache" ]; then
 		echo "can't reconfigure, because never configured before"
