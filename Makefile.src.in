@@ -48,6 +48,11 @@ OBJS_RC  := !!OBJS_RC!!
 OBJS     := $(OBJS_C) $(OBJS_CPP) $(OBJS_MM) $(OBJS_RC)
 SRCS     := !!SRCS!!
 
+PROM_DIR=!!PROM_DIR!!
+PROM_LIB=!!PROM_LIB!!
+PROM_INCLUDE=!!PROM_INCLUDE!!
+PROM_CORE=!!PROM_CORE!!
+
 # All C-files depend on those 3 files
 FILE_DEP := $(CONFIG_CACHE_COMPILER)
 # Create all dirs and subdirs
@@ -224,6 +229,7 @@ endif
 %.h %.hpp %.hpp.sq:
 	@true
 
+PROM_FLAGS := -I$(PROM_INCLUDE) -L$(PROM_LIB)
 
 # Compile all the files according to the targets
 
@@ -233,19 +239,19 @@ $(OBJS_C): %.o: $(SRC_DIR)/%.c $(DEP_MASK) $(FILE_DEP)
 
 $(filter-out %sse2.o, $(filter-out %ssse3.o, $(filter-out %sse4.o, $(OBJS_CPP)))): %.o: $(SRC_DIR)/%.cpp $(DEP_MASK) $(FILE_DEP)
 	$(E) '$(STAGE) Compiling $(<:$(SRC_DIR)/%.cpp=%.cpp)'
-	$(Q)$(CXX_HOST) $(CFLAGS) $(CXXFLAGS) -c -o $@ $<
+	$(Q)$(CXX_HOST) $(CFLAGS) $(CXXFLAGS) $(PROM_FLAGS) -c -o $@ $<
 
 $(filter %sse2.o, $(OBJS_CPP)): %.o: $(SRC_DIR)/%.cpp $(DEP_MASK) $(FILE_DEP)
 	$(E) '$(STAGE) Compiling $(<:$(SRC_DIR)/%.cpp=%.cpp)'
-	$(Q)$(CXX_HOST) $(CFLAGS) $(CXXFLAGS) -c -msse2 -o $@ $<
+	$(Q)$(CXX_HOST) $(CFLAGS) $(CXXFLAGS) $(PROM_FLAGS) -c -msse2 -o $@ $<
 
 $(filter %ssse3.o, $(OBJS_CPP)): %.o: $(SRC_DIR)/%.cpp $(DEP_MASK) $(FILE_DEP)
 	$(E) '$(STAGE) Compiling $(<:$(SRC_DIR)/%.cpp=%.cpp)'
-	$(Q)$(CXX_HOST) $(CFLAGS) $(CXXFLAGS) -c -mssse3 -o $@ $<
+	$(Q)$(CXX_HOST) $(CFLAGS) $(CXXFLAGS) $(PROM_FLAGS) -c -mssse3 -o $@ $<
 
 $(filter %sse4.o, $(OBJS_CPP)): %.o: $(SRC_DIR)/%.cpp $(DEP_MASK) $(FILE_DEP)
 	$(E) '$(STAGE) Compiling $(<:$(SRC_DIR)/%.cpp=%.cpp)'
-	$(Q)$(CXX_HOST) $(CFLAGS) $(CXXFLAGS) -c -msse4.1 -o $@ $<
+	$(Q)$(CXX_HOST) $(CFLAGS) $(CXXFLAGS) $(PROM_FLAGS) -c -msse4.1 -o $@ $<
 
 $(OBJS_MM): %.o: $(SRC_DIR)/%.mm $(DEP_MASK) $(FILE_DEP)
 	$(E) '$(STAGE) Compiling $(<:$(SRC_DIR)/%.mm=%.mm)'
@@ -264,9 +270,9 @@ ifeq ($(OS), OSX)
 	$(Q)cp $(ROOT_DIR)/os/macosx/splash.png $(BIN_DIR)/baseset/
 endif
 
-$(TTD): $(OBJS) $(CONFIG_CACHE_LINKER)
+$(TTD): $(OBJS) $(CONFIG_CACHE_LINKER) $(PROM_CORE)
 	$(E) '$(STAGE) Linking $@'
-	$(Q)+$(CXX_HOST) $(LDFLAGS) $(OBJS) $(LIBS) -o $@
+	$(Q)+$(CXX_HOST) $(LDFLAGS) $(OBJS) $(LIBS) -lprometheus-cpp-pull -lprometheus-cpp-push -lprometheus-cpp-core $(PROM_FLAGS) -o $@
 ifdef STRIP
 	$(Q)$(STRIP) $@
 endif
@@ -296,5 +302,14 @@ mrproper: clean
 
 %.o:
 	@echo '$(STAGE) No such source-file: $(@:%.o=%).[c|cpp|mm|rc]'
+
+.ONESHELL:
+$(PROM_CORE): $(PROM_DIR)/core
+	mkdir -p $(PROM_DIR)/build
+	cd $(PROM_DIR)/build
+	cmake .. -DBUILD_SHARED_LIBS=OFF
+	make -j 4
+	mkdir -p $(PROM_DIR)/out
+	make DESTDIR=$(PROM_DIR)/out install
 
 .PHONY: all mrproper depend clean FORCE
