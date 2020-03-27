@@ -72,6 +72,8 @@
 
 #include "safeguards.h"
 
+#include "metrics.h"
+
 void CallLandscapeTick();
 void IncreaseDate();
 void DoPaletteAnimations();
@@ -864,6 +866,10 @@ int openttd_main(int argc, char *argv[])
 	/* ScanNewGRFFiles now has control over the scanner. */
 	ScanNewGRFFiles(scanner);
 	scanner = NULL;
+
+	if (dedicated) {
+		prom::RegisterMetrics();
+	}
 
 	VideoDriver::GetInstance()->MainLoop();
 
