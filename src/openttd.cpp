@@ -73,6 +73,8 @@
 
 #include "safeguards.h"
 
+#include "metrics.h"
+
 void CallLandscapeTick();
 void IncreaseDate();
 void DoPaletteAnimations();

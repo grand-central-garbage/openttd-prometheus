@@ -67,7 +67,7 @@ void NetworkServerYearlyLoop();
 void NetworkServerSendConfigUpdate();
 void NetworkServerShowStatusToConsole();
 bool NetworkServerStart();
-void NetworkServerNewCompany(const Company *company, NetworkClientInfo *ci);
+void NetworkServerNewCompany(Company *company, NetworkClientInfo *ci);
 bool NetworkServerChangeClientName(ClientID client_id, const char *new_name);
 
 

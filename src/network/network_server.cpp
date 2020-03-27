@@ -2169,7 +2169,7 @@ void NetworkPrintClients()
  * @param c  The newly created company; can't be nullptr.
  * @param ci The client information of the client that made the company; can be nullptr.
  */
-void NetworkServerNewCompany(const Company *c, NetworkClientInfo *ci)
+void NetworkServerNewCompany(Company *c, NetworkClientInfo *ci)
 {
 	assert(c != nullptr);
 
@@ -2195,4 +2195,6 @@ void NetworkServerNewCompany(const Company *c, NetworkClientInfo *ci)
 		   and then learn about a possibly joining client (see FS#6025) */
 		NetworkServerSendChat(NETWORK_ACTION_COMPANY_NEW, DESTTYPE_BROADCAST, 0, "", ci->client_id, c->index + 1);
 	}
+
+	c->metrics = new prom::CompanyMetrics(c->index);
 }
