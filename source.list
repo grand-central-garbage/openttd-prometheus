@@ -51,6 +51,7 @@ linkgraph/linkgraphschedule.cpp
 linkgraph/mcf.cpp
 linkgraph/refresh.cpp
 map.cpp
+metrics.cpp
 misc.cpp
 mixer.cpp
 music.cpp

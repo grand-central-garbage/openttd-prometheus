@@ -19,6 +19,8 @@
 #include "settings_type.h"
 #include "group.h"
 
+#include "metrics.h"
+
 /** Statistics about the economy. */
 struct CompanyEconomyEntry {
 	Money income;               ///< The amount of income.
@@ -114,6 +116,8 @@ struct CompanyProperties {
 struct Company : CompanyPool::PoolItem<&_company_pool>, CompanyProperties {
 	Company(uint16 name_1 = 0, bool is_ai = false);
 	~Company();
+
+	prom::CompanyMetrics *metrics;
 
 	Livery livery[LS_END];
 	RailTypes avail_railtypes;         ///< Rail types available to this company.

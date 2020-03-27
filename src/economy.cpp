@@ -56,6 +56,8 @@
 
 #include "safeguards.h"
 
+#include "metrics.h"
+
 
 /* Initialize the cargo payment-pool */
 CargoPaymentPool _cargo_payment_pool("CargoPayment");
