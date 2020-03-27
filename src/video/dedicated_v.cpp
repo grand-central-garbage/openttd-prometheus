@@ -287,6 +287,8 @@ void VideoDriver_Dedicated::MainLoop()
 		return;
 	}
 
+	prom::RegisterMetrics();
+
 	while (!_exit_game) {
 		uint32 prev_cur_ticks = cur_ticks; // to check for wrapping
 		InteractiveRandom(); // randomness
