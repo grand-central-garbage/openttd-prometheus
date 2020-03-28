@@ -1138,6 +1138,12 @@ static Money DeliverGoods(int num_pieces, CargoID cargo_type, StationID dest, Ti
 		}
 	}
 
+	if (company->metrics_initialised) {
+		company->metrics->increment_cargo_delivered(cs->label, accepted_total);
+		company->metrics->increment_cargo_delivered_income(cs->label, profit);
+		company->metrics->income_counter->Increment(profit);
+	}
+
 	return profit;
 }
 
@@ -1228,10 +1234,6 @@ void CargoPayment::PayFinalDelivery(const CargoPacket *cp, uint count)
 	/* Handle end of route payment */
 	Money profit = DeliverGoods(count, this->ct, this->current_station, cp->SourceStationXY(), cp->DaysInTransit(), this->owner, cp->SourceSubsidyType(), cp->SourceSubsidyID());
 	this->route_profit += profit;
-
-	if (this->owner->metrics_initialised) {
-		this->owner->metrics->income_counter->Increment(profit);
-	}
 
 	/* The vehicle's profit is whatever route profit there is minus feeder shares. */
 	this->visual_profit += profit - cp->FeederShare(count);
