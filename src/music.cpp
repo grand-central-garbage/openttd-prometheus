@@ -14,7 +14,6 @@
 #define SET_TYPE "music"
 #include "base_media_func.h"
 
-#include "safeguards.h"
 #include "fios.h"
 
 
