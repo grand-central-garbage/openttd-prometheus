@@ -118,6 +118,7 @@ struct Company : CompanyPool::PoolItem<&_company_pool>, CompanyProperties {
 	Company(uint16 name_1 = 0, bool is_ai = false);
 	~Company();
 
+	bool metrics_initialised = false;
 	prom::CompanyMetrics *metrics;
 
 	Livery livery[LS_END];
