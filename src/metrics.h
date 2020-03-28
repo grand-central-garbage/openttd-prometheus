@@ -20,6 +20,7 @@
 #include <prometheus/registry.h>
 
 #include "stdafx.h"
+#include "cargotype.h"
 
 namespace prom {
 using namespace prometheus;
@@ -32,12 +33,20 @@ class CompanyMetrics {
  private:
   uint16 name;
 
+  std::map<CargoLabel, std::shared_ptr<prometheus::Counter>>
+      cargo_delivered_counters;
+  std::map<CargoLabel, std::shared_ptr<prometheus::Counter>>
+      cargo_delivered_income_counters;
+
  public:
   CompanyMetrics(uint16 name_1);
   ~CompanyMetrics();
 
   std::shared_ptr<prometheus::Counter> income_counter;
   std::shared_ptr<prometheus::Counter> expenses_counter;
+
+  void increment_cargo_delivered(CargoLabel label, double amount);
+  void increment_cargo_delivered_income(CargoLabel label, double amount);
 };
 }  // namespace prom
 
