@@ -216,6 +216,10 @@ static void SubtractMoneyFromAnyCompany(Company *c, CommandCost cost)
 	c->money -= cost.GetCost();
 	c->yearly_expenses[0][cost.GetExpensesType()] += cost.GetCost();
 
+	if (c->metrics_initialised) {
+		c->metrics->expenses_counter->Increment(cost.GetCost());
+	}
+
 	if (HasBit(1 << EXPENSES_TRAIN_INC    |
 	           1 << EXPENSES_ROADVEH_INC  |
 	           1 << EXPENSES_AIRCRAFT_INC |
