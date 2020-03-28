@@ -2207,6 +2207,7 @@ void NetworkServerNewCompany(Company *c, NetworkClientInfo *ci)
 	}
 
 	c->metrics = new prom::CompanyMetrics(c->index);
+	c->metrics_initialised = true;
 }
 
 #endif /* ENABLE_NETWORK */
