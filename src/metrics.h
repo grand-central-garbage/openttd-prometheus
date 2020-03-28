@@ -32,11 +32,12 @@ class CompanyMetrics {
  private:
   uint16 name;
 
-  std::shared_ptr<prometheus::Counter> income_counter;
-
  public:
   CompanyMetrics(uint16 name_1);
   ~CompanyMetrics();
+
+  std::shared_ptr<prometheus::Counter> income_counter;
+  std::shared_ptr<prometheus::Counter> expenses_counter;
 };
 }  // namespace prom
 
