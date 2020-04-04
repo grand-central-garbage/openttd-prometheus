@@ -14,6 +14,8 @@
 #include "strings_func.h"
 #include <algorithm>
 
+#include <iostream>
+
 #include "table/sprites.h"
 #include "table/strings.h"
 #include "table/cargo_const.h"
