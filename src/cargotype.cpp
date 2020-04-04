@@ -16,6 +16,8 @@
 #include "strings_func.h"
 #include "core/sort_func.hpp"
 
+#include <iostream>
+
 #include "table/sprites.h"
 #include "table/strings.h"
 #include "table/cargo_const.h"
