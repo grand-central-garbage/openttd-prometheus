@@ -237,19 +237,19 @@ $(OBJS_C): %.o: $(SRC_DIR)/%.c $(DEP_MASK) $(FILE_DEP)
 	$(E) '$(STAGE) Compiling $(<:$(SRC_DIR)/%.c=%.c)'
 	$(Q)$(CC_HOST) $(CFLAGS) -c -o $@ $<
 
-$(filter-out %sse2.o, $(filter-out %ssse3.o, $(filter-out %sse4.o, $(OBJS_CPP)))): %.o: $(SRC_DIR)/%.cpp $(DEP_MASK) $(FILE_DEP)
+$(filter-out %sse2.o, $(filter-out %ssse3.o, $(filter-out %sse4.o, $(OBJS_CPP)))): %.o: $(SRC_DIR)/%.cpp $(DEP_MASK) $(FILE_DEP) $(PROM_CORE)
 	$(E) '$(STAGE) Compiling $(<:$(SRC_DIR)/%.cpp=%.cpp)'
 	$(Q)$(CXX_HOST) $(CFLAGS) $(CXXFLAGS) $(PROM_FLAGS) -c -o $@ $<
 
-$(filter %sse2.o, $(OBJS_CPP)): %.o: $(SRC_DIR)/%.cpp $(DEP_MASK) $(FILE_DEP)
+$(filter %sse2.o, $(OBJS_CPP)): %.o: $(SRC_DIR)/%.cpp $(DEP_MASK) $(FILE_DEP) $(PROM_CORE)
 	$(E) '$(STAGE) Compiling $(<:$(SRC_DIR)/%.cpp=%.cpp)'
 	$(Q)$(CXX_HOST) $(CFLAGS) $(CXXFLAGS) $(PROM_FLAGS) -c -msse2 -o $@ $<
 
-$(filter %ssse3.o, $(OBJS_CPP)): %.o: $(SRC_DIR)/%.cpp $(DEP_MASK) $(FILE_DEP)
+$(filter %ssse3.o, $(OBJS_CPP)): %.o: $(SRC_DIR)/%.cpp $(DEP_MASK) $(FILE_DEP) $(PROM_CORE)
 	$(E) '$(STAGE) Compiling $(<:$(SRC_DIR)/%.cpp=%.cpp)'
 	$(Q)$(CXX_HOST) $(CFLAGS) $(CXXFLAGS) $(PROM_FLAGS) -c -mssse3 -o $@ $<
 
-$(filter %sse4.o, $(OBJS_CPP)): %.o: $(SRC_DIR)/%.cpp $(DEP_MASK) $(FILE_DEP)
+$(filter %sse4.o, $(OBJS_CPP)): %.o: $(SRC_DIR)/%.cpp $(DEP_MASK) $(FILE_DEP) $(PROM_CORE)
 	$(E) '$(STAGE) Compiling $(<:$(SRC_DIR)/%.cpp=%.cpp)'
 	$(Q)$(CXX_HOST) $(CFLAGS) $(CXXFLAGS) $(PROM_FLAGS) -c -msse4.1 -o $@ $<
 
@@ -270,7 +270,7 @@ ifeq ($(OS), OSX)
 	$(Q)cp $(ROOT_DIR)/os/macosx/splash.png $(BIN_DIR)/baseset/
 endif
 
-$(TTD): $(OBJS) $(CONFIG_CACHE_LINKER) $(PROM_CORE)
+$(TTD): $(OBJS) $(CONFIG_CACHE_LINKER)
 	$(E) '$(STAGE) Linking $@'
 	$(Q)+$(CXX_HOST) $(LDFLAGS) $(OBJS) $(LIBS) -lprometheus-cpp-pull -lprometheus-cpp-push -lprometheus-cpp-core $(PROM_FLAGS) -o $@
 ifdef STRIP
