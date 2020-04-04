@@ -10,7 +10,7 @@ git remote update upstream
 
 commits_to_backport=$(git cherry upstream/master | grep "^\+" | cut -d' ' -f2)
 
-for i in "1.9 1.9.3" "1.10 1.10.0-RC1"; do
+for i in "1.9 1.9.3" "1.10 1.10.0"; do
     set -- $i
     branch=$1
     tag=$2
