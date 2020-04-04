@@ -1,7 +1,5 @@
 #include "metrics.h"
 
-#include <iostream>
-
 #include "cargotype.h"
 #include "stdafx.h"
 #include "strings_func.h"
@@ -14,30 +12,30 @@ auto prometheus_registry = std::make_shared<Registry>();
 
 Family<Counter> &income_counter_family =
     BuildCounter()
-        .Name("income_money")
+        .Name("openttd_income_money")
         .Help("how much money this player has earned")
         .Register(*prometheus_registry);
 
 Family<Counter> &expenses_counter_family =
     BuildCounter()
-        .Name("expenses_money")
+        .Name("openttd_expenses_money")
         .Help("how much money this player has spent")
         .Register(*prometheus_registry);
 
 Family<Counter> &cargo_delivered_family =
     BuildCounter()
-        .Name("cargo_delivered")
+        .Name("openttd_cargo_delivered")
         .Help("how much cargo this player has delivered")
         .Register(*prometheus_registry);
 
 Family<Counter> &cargo_delivered_income_family =
     BuildCounter()
-        .Name("cargo_delivered_income")
+        .Name("openttd_cargo_delivered_income")
         .Help("how much income this player has earned from a cargo type")
         .Register(*prometheus_registry);
 
 void RegisterMetrics() {
-  static Exposer exposer{"127.0.0.1:8080", "/metrics", 1};
+  static Exposer exposer{"127.0.0.1:10808", "/metrics", 1};
   exposer.RegisterCollectable(prometheus_registry);
 }
 
