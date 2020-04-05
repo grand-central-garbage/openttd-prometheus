@@ -1039,9 +1039,9 @@ void CallVehicleTicks()
 		int z = v->z_pos;
 
 		const Company *c = Company::Get(_current_company);
-		SubtractMoneyFromCompany(CommandCost(EXPENSES_NEW_VEHICLES, (Money)c->settings.engine_renew_money));
+		SubtractMoneyFromCompany(CommandCost(EXPENSES_HIDDEN, (Money)c->settings.engine_renew_money));
 		CommandCost res = DoCommand(0, v->index, 0, DC_EXEC, CMD_AUTOREPLACE_VEHICLE);
-		SubtractMoneyFromCompany(CommandCost(EXPENSES_NEW_VEHICLES, -(Money)c->settings.engine_renew_money));
+		SubtractMoneyFromCompany(CommandCost(EXPENSES_HIDDEN, -(Money)c->settings.engine_renew_money));
 
 		if (!IsLocalCompany()) continue;
 

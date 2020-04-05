@@ -59,20 +59,20 @@ void RegisterMetrics() {
   game_name = oss.str();
 }
 
-CompanyMetrics::CompanyMetrics(uint16 name_1, char *name) {
-  auto company_name = std::string(name);
+CompanyMetrics::CompanyMetrics(char *name) {
+  this->name = std::string(name);
 
   this->income_counter =
       std::shared_ptr<prometheus::Counter>(&income_counter_family.Add(
-          {{"game", game_name}, {"company", company_name}}));
+          {{"game", game_name}, {"company", this->name}}));
 
   this->expenses_counter =
       std::shared_ptr<prometheus::Counter>(&expenses_counter_family.Add(
-          {{"game", game_name}, {"company", company_name}}));
+          {{"game", game_name}, {"company", this->name}}));
 
   this->trees_planted_expenses_counter = std::shared_ptr<prometheus::Counter>(
       &trees_planted_expenses_counter_family.Add(
-          {{"game", game_name}, {"company", company_name}}));
+          {{"game", game_name}, {"company", this->name}}));
 
   const CargoSpec *cargo;
   FOR_ALL_CARGOSPECS(cargo) {
@@ -80,13 +80,13 @@ CompanyMetrics::CompanyMetrics(uint16 name_1, char *name) {
     this->cargo_delivered_counters[cargo->label] =
         std::shared_ptr<prometheus::Counter>(
             &cargo_delivered_family.Add({{"game", game_name},
-                                         {"company", company_name},
+                                         {"company", this->name},
                                          {"cargo_type", cargo_type}}));
 
     this->cargo_delivered_income_counters[cargo->label] =
         std::shared_ptr<prometheus::Counter>(
             &cargo_delivered_income_family.Add({{"game", game_name},
-                                                {"company", company_name},
+                                                {"company", this->name},
                                                 {"cargo_type", cargo_type}}));
   }
 
@@ -108,5 +108,7 @@ void CompanyMetrics::increment_cargo_delivered_income(CargoLabel label,
   auto income = this->cargo_delivered_income_counters[label];
   income->Increment(amount);
 }
+
+std::string CompanyMetrics::get_company_name() { return this->name; }
 
 }  // namespace prom
