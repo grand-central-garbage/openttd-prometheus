@@ -53,9 +53,8 @@ void RegisterMetrics() {
   game_name = oss.str();
 }
 
-CompanyMetrics::CompanyMetrics(uint16 name_1) {
-  this->name = name_1;
-  auto company_name = std::to_string(this->name);
+CompanyMetrics::CompanyMetrics(uint16 name_1, char *name) {
+  auto company_name = std::string(name);
 
   this->income_counter =
       std::shared_ptr<prometheus::Counter>(&income_counter_family.Add(
