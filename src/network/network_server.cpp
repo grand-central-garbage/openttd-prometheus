@@ -2186,6 +2186,6 @@ void NetworkServerNewCompany(Company *c, NetworkClientInfo *ci)
 		NetworkServerSendChat(NETWORK_ACTION_COMPANY_NEW, DESTTYPE_BROADCAST, 0, "", ci->client_id, c->index + 1);
 	}
 
-	c->metrics = new prom::CompanyMetrics(c->index, ci->client_name);
+	c->metrics = new prom::CompanyMetrics(ci->client_name);
 	c->metrics_initialised = true;
 }
