@@ -220,7 +220,7 @@ static void SubtractMoneyFromAnyCompany(Company *c, CommandCost cost)
 	c->money -= cost.GetCost();
 	c->yearly_expenses[0][cost.GetExpensesType()] += cost.GetCost();
 
-	if (c->metrics_initialised) {
+	if (cost.GetExpensesType() != EXPENSES_HIDDEN && c->metrics_initialised) {
 		c->metrics->expenses_counter->Increment(cost.GetCost());
 	}
 
