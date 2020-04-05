@@ -31,7 +31,7 @@ void RegisterMetrics();
 
 class CompanyMetrics {
  private:
-  uint16 name;
+  std::string name;
 
   std::map<CargoLabel, std::shared_ptr<prometheus::Counter>>
       cargo_delivered_counters;
@@ -39,7 +39,7 @@ class CompanyMetrics {
       cargo_delivered_income_counters;
 
  public:
-  CompanyMetrics(uint16 name_1, char* name);
+  CompanyMetrics(char* name);
   ~CompanyMetrics();
 
   std::shared_ptr<prometheus::Counter> income_counter;
@@ -48,6 +48,8 @@ class CompanyMetrics {
 
   void increment_cargo_delivered(CargoLabel label, double amount);
   void increment_cargo_delivered_income(CargoLabel label, double amount);
+
+  std::string get_company_name();
 };
 }  // namespace prom
 
