@@ -41,6 +41,12 @@ Family<Counter> &cargo_delivered_income_family =
         .Help("how much income this player has earned from a cargo type")
         .Register(*prometheus_registry);
 
+Family<Counter> &trees_planted_expenses_counter_family =
+    BuildCounter()
+        .Name("openttd_trees_expenses_money")
+        .Help("how much money this player has spent on planting trees")
+        .Register(*prometheus_registry);
+
 void RegisterMetrics() {
   static Exposer exposer{"127.0.0.1:10808", "/metrics", 1};
   exposer.RegisterCollectable(prometheus_registry);
@@ -62,6 +68,10 @@ CompanyMetrics::CompanyMetrics(uint16 name_1, char *name) {
 
   this->expenses_counter =
       std::shared_ptr<prometheus::Counter>(&expenses_counter_family.Add(
+          {{"game", game_name}, {"company", company_name}}));
+
+  this->trees_planted_expenses_counter = std::shared_ptr<prometheus::Counter>(
+      &trees_planted_expenses_counter_family.Add(
           {{"game", game_name}, {"company", company_name}}));
 
   const CargoSpec *cargo;
