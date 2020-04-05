@@ -39,7 +39,7 @@ class CompanyMetrics {
       cargo_delivered_income_counters;
 
  public:
-  CompanyMetrics(uint16 name_1);
+  CompanyMetrics(uint16 name_1, char* name);
   ~CompanyMetrics();
 
   std::shared_ptr<prometheus::Counter> income_counter;
