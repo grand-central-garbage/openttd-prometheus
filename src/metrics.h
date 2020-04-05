@@ -44,6 +44,7 @@ class CompanyMetrics {
 
   std::shared_ptr<prometheus::Counter> income_counter;
   std::shared_ptr<prometheus::Counter> expenses_counter;
+  std::shared_ptr<prometheus::Counter> trees_planted_expenses_counter;
 
   void increment_cargo_delivered(CargoLabel label, double amount);
   void increment_cargo_delivered_income(CargoLabel label, double amount);
