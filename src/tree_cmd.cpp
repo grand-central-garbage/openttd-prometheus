@@ -452,6 +452,11 @@ CommandCost CmdPlantTree(TileIndex tile, DoCommandFlag flags, uint32 p1, uint32 
 	if (cost.GetCost() == 0) {
 		return_cmd_error(msg);
 	} else {
+		if (flags & DC_EXEC) {
+			if (c->metrics_initialised) {
+				c->metrics->trees_planted_expenses_counter->Increment(cost.GetCost());
+			}
+		}
 		return cost;
 	}
 }
