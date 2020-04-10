@@ -1096,7 +1096,7 @@ static uint DeliverGoodsToIndustry(const Station *st, CargoID cargo_type, uint n
  * @return Revenue for delivering cargo
  * @note The cargo is just added to the stockpile of the industry. It is due to the caller to trigger the industry's production machinery
  */
-static Money DeliverGoods(int num_pieces, CargoID cargo_type, StationID dest, TileIndex source_tile, byte days_in_transit, Company *company, SourceType src_type, SourceID src)
+static Money DeliverGoods(int num_pieces, CargoID cargo_type, StationID dest, TileIndex source_tile, byte days_in_transit, Company *company, SourceType src_type, SourceID src, Vehicle *vehicle)
 {
 	assert(num_pieces > 0);
 
@@ -1138,9 +1138,9 @@ static Money DeliverGoods(int num_pieces, CargoID cargo_type, StationID dest, Ti
 		}
 	}
 
-	if (company->metrics_initialised) {
-		company->metrics->increment_cargo_delivered(cs->label, accepted_total);
-		company->metrics->increment_cargo_delivered_income(cs->label, profit);
+	if (company->metrics_initialised && cs != nullptr) {
+		company->metrics->increment_cargo_delivered(cs->label, vehicle->type, accepted_total);
+		company->metrics->increment_cargo_delivered_income(cs->label, vehicle->type, profit);
 		company->metrics->income_counter->Increment(profit);
 	}
 
@@ -1232,7 +1232,7 @@ void CargoPayment::PayFinalDelivery(const CargoPacket *cp, uint count)
 	}
 
 	/* Handle end of route payment */
-	Money profit = DeliverGoods(count, this->ct, this->current_station, cp->SourceStationXY(), cp->DaysInTransit(), this->owner, cp->SourceSubsidyType(), cp->SourceSubsidyID());
+	Money profit = DeliverGoods(count, this->ct, this->current_station, cp->SourceStationXY(), cp->DaysInTransit(), this->owner, cp->SourceSubsidyType(), cp->SourceSubsidyID(), this->front);
 	this->route_profit += profit;
 
 	/* The vehicle's profit is whatever route profit there is minus feeder shares. */
