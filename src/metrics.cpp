@@ -5,9 +5,10 @@
 #include <iostream>
 #include <sstream>
 
-#include "cargotype.h"
 #include "stdafx.h"
+#include "cargotype.h"
 #include "strings_func.h"
+#include "vehicle_type.h"
 
 namespace prom {
 
@@ -77,17 +78,51 @@ CompanyMetrics::CompanyMetrics(char *name) {
   const CargoSpec *cargo;
   FOR_ALL_CARGOSPECS(cargo) {
     auto cargo_type = std::string(GetStringPtr(cargo->name));
-    this->cargo_delivered_counters[cargo->label] =
-        std::shared_ptr<prometheus::Counter>(
-            &cargo_delivered_family.Add({{"game", game_name},
-                                         {"company", this->name},
-                                         {"cargo_type", cargo_type}}));
 
-    this->cargo_delivered_income_counters[cargo->label] =
-        std::shared_ptr<prometheus::Counter>(
-            &cargo_delivered_income_family.Add({{"game", game_name},
-                                                {"company", this->name},
-                                                {"cargo_type", cargo_type}}));
+    std::initializer_list<VehicleType> vehicle_types = {VEH_TRAIN, VEH_ROAD,
+                                                        VEH_SHIP, VEH_AIRCRAFT};
+    for (VehicleType vehicle_type : vehicle_types) {
+      std::string transport_type;
+
+      switch (vehicle_type) {
+        case VEH_TRAIN:
+          transport_type = "train";
+          break;
+
+        case VEH_ROAD:
+          transport_type = "road_vehicle";
+          break;
+
+        case VEH_AIRCRAFT:
+          transport_type = "aircraft";
+          break;
+
+        case VEH_SHIP:
+          transport_type = "ship";
+          break;
+
+        default:
+          transport_type = "mystery";
+          break;
+      }
+
+      this->cargo_delivered_counters[std::make_pair(cargo->label,
+                                                    vehicle_type)] =
+          std::shared_ptr<prometheus::Counter>(&cargo_delivered_family.Add(
+              {{"game", game_name},
+               {"company", this->name},
+               {"cargo_type", cargo_type},
+               {"transport_type", transport_type}}));
+
+      this->cargo_delivered_income_counters[std::make_pair(cargo->label,
+                                                           vehicle_type)] =
+          std::shared_ptr<prometheus::Counter>(
+              &cargo_delivered_income_family.Add(
+                  {{"game", game_name},
+                   {"company", this->name},
+                   {"cargo_type", cargo_type},
+                   {"transport_type", transport_type}}));
+    }
   }
 
   std::cout << "creatign metrics" << this->name << std::endl;
@@ -98,15 +133,17 @@ CompanyMetrics::~CompanyMetrics() {
 }
 
 void CompanyMetrics::increment_cargo_delivered(CargoLabel label,
+                                               VehicleType type,
                                                double amount) {
-  auto delivered = this->cargo_delivered_counters[label];
-  delivered->Increment(amount);
+  this->cargo_delivered_counters[std::make_pair(label, type)]->Increment(
+      amount);
 }
 
 void CompanyMetrics::increment_cargo_delivered_income(CargoLabel label,
+                                                      VehicleType type,
                                                       double amount) {
-  auto income = this->cargo_delivered_income_counters[label];
-  income->Increment(amount);
+  this->cargo_delivered_income_counters[std::make_pair(label, type)]->Increment(
+      amount);
 }
 
 std::string CompanyMetrics::get_company_name() { return this->name; }
