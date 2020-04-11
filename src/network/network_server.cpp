@@ -2208,6 +2208,7 @@ void NetworkServerNewCompany(Company *c, NetworkClientInfo *ci)
 
 	c->metrics = new prom::CompanyMetrics(ci->client_name);
 	c->metrics_initialised = true;
+	c->metrics->update_bank_balance(c->money, c->current_loan);
 }
 
 #endif /* ENABLE_NETWORK */

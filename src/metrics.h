@@ -38,11 +38,15 @@ class CompanyMetrics {
   std::map<std::pair<CargoLabel, VehicleType>,
            std::shared_ptr<prometheus::Counter>>
       cargo_delivered_counters;
+
   std::map<std::pair<CargoLabel, VehicleType>,
            std::shared_ptr<prometheus::Counter>>
       cargo_delivered_income_counters;
+
   std::map<VehicleType, std::shared_ptr<prometheus::Gauge>>
       vehicles_owned_family_gauges;
+
+  std::shared_ptr<prometheus::Gauge> bank_balance;
 
  public:
   CompanyMetrics(char* name);
@@ -58,6 +62,8 @@ class CompanyMetrics {
                                         double amount);
 
   void update_vehicle_counts(GroupStatistics* gs);
+
+  void update_bank_balance(Money money, Money current_loan);
 
   std::string get_company_name();
 };
