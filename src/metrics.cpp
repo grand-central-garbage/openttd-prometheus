@@ -55,6 +55,12 @@ Family<Counter> &trees_planted_expenses_counter_family =
         .Help("how much money this player has spent on planting trees")
         .Register(*prometheus_registry);
 
+Family<Gauge> &bank_balance_family =
+    BuildGauge()
+        .Name("openttd_bank_balance")
+        .Help("the bank balance of this player (current money - current loan)")
+        .Register(*prometheus_registry);
+
 void RegisterMetrics() {
   static Exposer exposer{"127.0.0.1:10808", "/metrics", 1};
   exposer.RegisterCollectable(prometheus_registry);
@@ -81,6 +87,9 @@ CompanyMetrics::CompanyMetrics(char *name) {
   this->trees_planted_expenses_counter = std::shared_ptr<prometheus::Counter>(
       &trees_planted_expenses_counter_family.Add(
           {{"game", game_name}, {"company", this->name}}));
+
+  this->bank_balance = std::shared_ptr<prometheus::Gauge>(
+      &bank_balance_family.Add({{"game", game_name}, {"company", this->name}}));
 
   std::initializer_list<VehicleType> vehicle_types = {VEH_TRAIN, VEH_ROAD,
                                                       VEH_SHIP, VEH_AIRCRAFT};
@@ -166,6 +175,10 @@ void CompanyMetrics::update_vehicle_counts(GroupStatistics *gs) {
     this->vehicles_owned_family_gauges[vehicle_type]->Set(
         gs[vehicle_type].num_vehicle);
   }
+}
+
+void CompanyMetrics::update_bank_balance(Money money, Money current_loan) {
+  this->bank_balance->Set(money - current_loan);
 }
 
 std::string CompanyMetrics::get_company_name() { return this->name; }
