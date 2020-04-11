@@ -236,6 +236,7 @@ static void SubtractMoneyFromAnyCompany(Company *c, CommandCost cost)
 
 	if (c->metrics_initialised) {
 		c->metrics->update_vehicle_counts(c->group_all);
+		c->metrics->update_bank_balance(c->money, c->current_loan);
 	}
 
 	InvalidateCompanyWindows(c);
