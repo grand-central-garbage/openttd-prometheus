@@ -238,6 +238,10 @@ static void SubtractMoneyFromAnyCompany(Company *c, CommandCost cost)
 		c->cur_economy.expenses -= cost.GetCost();
 	}
 
+	if (c->metrics_initialised) {
+		c->metrics->update_vehicle_counts(c->group_all);
+	}
+
 	InvalidateCompanyWindows(c);
 }
 
