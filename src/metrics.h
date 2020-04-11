@@ -21,6 +21,7 @@
 
 #include "stdafx.h"
 #include "cargotype.h"
+#include "economy_type.h"
 #include "group.h"
 #include "vehicle_type.h"
 
@@ -46,6 +47,9 @@ class CompanyMetrics {
   std::map<VehicleType, std::shared_ptr<prometheus::Gauge>>
       vehicles_owned_family_gauges;
 
+  std::map<ExpensesType, std::shared_ptr<prometheus::Counter>>
+      vehicle_running_costs_family_counters;
+
   std::shared_ptr<prometheus::Gauge> bank_balance;
 
  public:
@@ -60,6 +64,8 @@ class CompanyMetrics {
                                  double amount);
   void increment_cargo_delivered_income(CargoLabel label, VehicleType type,
                                         double amount);
+
+  void increment_vehicle_running_costs(ExpensesType type, double amount);
 
   void update_vehicle_counts(GroupStatistics* gs);
 

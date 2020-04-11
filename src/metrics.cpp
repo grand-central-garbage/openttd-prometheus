@@ -5,9 +5,10 @@
 #include <iostream>
 #include <sstream>
 
+#include "stdafx.h"
 #include "cargotype.h"
 #include "company_base.h"
-#include "stdafx.h"
+#include "economy_type.h"
 #include "strings_func.h"
 #include "vehicle_type.h"
 
@@ -55,6 +56,12 @@ Family<Counter> &trees_planted_expenses_counter_family =
         .Help("how much money this player has spent on planting trees")
         .Register(*prometheus_registry);
 
+Family<Counter> &vehicle_running_costs_family =
+    BuildCounter()
+        .Name("openttd_vehicle_running_costs")
+        .Help("how much money this player has spent on vehicle upkeep")
+        .Register(*prometheus_registry);
+
 Family<Gauge> &bank_balance_family =
     BuildGauge()
         .Name("openttd_bank_balance")
@@ -90,6 +97,40 @@ CompanyMetrics::CompanyMetrics(char *name) {
 
   this->bank_balance = std::shared_ptr<prometheus::Gauge>(
       &bank_balance_family.Add({{"game", game_name}, {"company", this->name}}));
+
+  std::initializer_list<ExpensesType> expenses_types = {
+      EXPENSES_TRAIN_RUN,
+      EXPENSES_ROADVEH_RUN,
+      EXPENSES_AIRCRAFT_RUN,
+      EXPENSES_SHIP_RUN,
+  };
+  for (ExpensesType expenses_type : expenses_types) {
+    std::string expense_type_name;
+
+    switch (expenses_type) {
+      case EXPENSES_TRAIN_RUN:
+        expense_type_name = "train";
+        break;
+
+      case EXPENSES_ROADVEH_RUN:
+        expense_type_name = "road";
+        break;
+
+      case EXPENSES_AIRCRAFT_RUN:
+        expense_type_name = "aircraft";
+        break;
+
+      case EXPENSES_SHIP_RUN:
+        expense_type_name = "ship";
+        break;
+    }
+
+    this->vehicle_running_costs_family_counters[expenses_type] =
+        std::shared_ptr<prometheus::Counter>(&vehicle_running_costs_family.Add(
+            {{"game", game_name},
+             {"company", this->name},
+             {"transport_type", expense_type_name}}));
+  }
 
   std::initializer_list<VehicleType> vehicle_types = {VEH_TRAIN, VEH_ROAD,
                                                       VEH_SHIP, VEH_AIRCRAFT};
@@ -166,6 +207,14 @@ void CompanyMetrics::increment_cargo_delivered_income(CargoLabel label,
                                                       double amount) {
   this->cargo_delivered_income_counters[std::make_pair(label, type)]->Increment(
       amount);
+}
+
+void CompanyMetrics::increment_vehicle_running_costs(ExpensesType type,
+                                                     double amount) {
+  if (type == EXPENSES_TRAIN_RUN || type == EXPENSES_ROADVEH_RUN ||
+      type == EXPENSES_AIRCRAFT_RUN || type == EXPENSES_SHIP_RUN) {
+    this->vehicle_running_costs_family_counters[type]->Increment(amount);
+  }
 }
 
 void CompanyMetrics::update_vehicle_counts(GroupStatistics *gs) {
