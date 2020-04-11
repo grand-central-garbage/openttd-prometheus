@@ -21,6 +21,7 @@
 
 #include "stdafx.h"
 #include "cargotype.h"
+#include "group.h"
 #include "vehicle_type.h"
 
 namespace prom {
@@ -40,6 +41,8 @@ class CompanyMetrics {
   std::map<std::pair<CargoLabel, VehicleType>,
            std::shared_ptr<prometheus::Counter>>
       cargo_delivered_income_counters;
+  std::map<VehicleType, std::shared_ptr<prometheus::Gauge>>
+      vehicles_owned_family_gauges;
 
  public:
   CompanyMetrics(char* name);
@@ -53,6 +56,8 @@ class CompanyMetrics {
                                  double amount);
   void increment_cargo_delivered_income(CargoLabel label, VehicleType type,
                                         double amount);
+
+  void update_vehicle_counts(GroupStatistics* gs);
 
   std::string get_company_name();
 };
