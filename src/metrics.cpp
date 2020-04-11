@@ -5,8 +5,9 @@
 #include <iostream>
 #include <sstream>
 
-#include "stdafx.h"
 #include "cargotype.h"
+#include "company_base.h"
+#include "stdafx.h"
 #include "strings_func.h"
 #include "vehicle_type.h"
 
@@ -42,6 +43,12 @@ Family<Counter> &cargo_delivered_income_family =
         .Help("how much income this player has earned from a cargo type")
         .Register(*prometheus_registry);
 
+Family<Gauge> &vehicles_owned_family =
+    BuildGauge()
+        .Name("openttd_vehicles_owned")
+        .Help("how many vehicles this player owns")
+        .Register(*prometheus_registry);
+
 Family<Counter> &trees_planted_expenses_counter_family =
     BuildCounter()
         .Name("openttd_trees_expenses_money")
@@ -75,36 +82,42 @@ CompanyMetrics::CompanyMetrics(char *name) {
       &trees_planted_expenses_counter_family.Add(
           {{"game", game_name}, {"company", this->name}}));
 
-  const CargoSpec *cargo;
-  FOR_ALL_CARGOSPECS(cargo) {
-    auto cargo_type = std::string(GetStringPtr(cargo->name));
+  std::initializer_list<VehicleType> vehicle_types = {VEH_TRAIN, VEH_ROAD,
+                                                      VEH_SHIP, VEH_AIRCRAFT};
+  for (VehicleType vehicle_type : vehicle_types) {
+    std::string transport_type;
 
-    std::initializer_list<VehicleType> vehicle_types = {VEH_TRAIN, VEH_ROAD,
-                                                        VEH_SHIP, VEH_AIRCRAFT};
-    for (VehicleType vehicle_type : vehicle_types) {
-      std::string transport_type;
+    switch (vehicle_type) {
+      case VEH_TRAIN:
+        transport_type = "train";
+        break;
 
-      switch (vehicle_type) {
-        case VEH_TRAIN:
-          transport_type = "train";
-          break;
+      case VEH_ROAD:
+        transport_type = "road";
+        break;
 
-        case VEH_ROAD:
-          transport_type = "road_vehicle";
-          break;
+      case VEH_AIRCRAFT:
+        transport_type = "aircraft";
+        break;
 
-        case VEH_AIRCRAFT:
-          transport_type = "aircraft";
-          break;
+      case VEH_SHIP:
+        transport_type = "ship";
+        break;
 
-        case VEH_SHIP:
-          transport_type = "ship";
-          break;
+      default:
+        transport_type = "mystery";
+        break;
+    }
 
-        default:
-          transport_type = "mystery";
-          break;
-      }
+    this->vehicles_owned_family_gauges[vehicle_type] =
+        std::shared_ptr<prometheus::Gauge>(
+            &vehicles_owned_family.Add({{"game", game_name},
+                                        {"company", this->name},
+                                        {"transport_type", transport_type}}));
+
+    const CargoSpec *cargo;
+    FOR_ALL_CARGOSPECS(cargo) {
+      auto cargo_type = std::string(GetStringPtr(cargo->name));
 
       this->cargo_delivered_counters[std::make_pair(cargo->label,
                                                     vehicle_type)] =
@@ -144,6 +157,15 @@ void CompanyMetrics::increment_cargo_delivered_income(CargoLabel label,
                                                       double amount) {
   this->cargo_delivered_income_counters[std::make_pair(label, type)]->Increment(
       amount);
+}
+
+void CompanyMetrics::update_vehicle_counts(GroupStatistics *gs) {
+  std::initializer_list<VehicleType> vehicle_types = {VEH_TRAIN, VEH_ROAD,
+                                                      VEH_SHIP, VEH_AIRCRAFT};
+  for (VehicleType vehicle_type : vehicle_types) {
+    this->vehicles_owned_family_gauges[vehicle_type]->Set(
+        gs[vehicle_type].num_vehicle);
+  }
 }
 
 std::string CompanyMetrics::get_company_name() { return this->name; }
