@@ -938,8 +938,8 @@ NetworkRecvStatus ServerNetworkGameSocketHandler::Receive_CLIENT_JOIN(Packet *p)
 			break;
 	}
 
-	/* We need a valid name.. make it Player */
-	if (StrEmpty(name)) strecpy(name, "Player", lastof(name));
+	/* We need a valid name... */
+	if (StrEmpty(name)) return this->SendError(NETWORK_ERROR_NAME_IN_USE);
 
 	if (!NetworkFindName(name, lastof(name))) { // Change name if duplicate
 		/* We could not create a name for this client */
